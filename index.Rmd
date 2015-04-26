@@ -1,0 +1,69 @@
+---
+title       : MtCars Prediction Tool
+subtitle    : 
+author      : cjstev
+job         : 
+framework   : io2012        # {io2012, html5slides, shower, dzslides, ...}
+highlighter : highlight.js  # {highlight.js, prettify, highlight}
+hitheme     : tomorrow      # 
+mode        : selfcontained # {standalone, draft}
+---
+
+## Introduction and Inspiration
+
+How many times have you been laying in bed wishing that you had a tool that could dynamically predict mpg from the mtcars dataset with a simple linear regression!?  Well now, you can.
+
+
+--- 
+
+## What is mtcars?
+
+<iframe src = 'https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/mtcars.html' height = '600px'></iframe>
+
+--- 
+
+## Plotting Mtcars
+
+```{r, echo=FALSE,fig.width=14, fig.height=4}
+require(ggplot2); data(mtcars)
+p1<-qplot(wt,mpg,data=mtcars,col=cyl,main="Wt vs MPG")
+p2<-qplot(hp,mpg,data=mtcars,col=cyl,main="Hp vs MPG")
+p3<-qplot(qsec,mpg,data=mtcars,col=cyl,main="1/4 mi Time vs MPG")
+p4<-qplot(carb,mpg,data=mtcars,col=cyl,main="# of Carbs vs MPG")
+grid.arrange(p1,p2,p3,ncol=3)
+```
+
+- Here we see that a few of the metrics appear to be correlated to MPG of the cars in the dataset.  
+- Unfortunately, we don't know how well correlated the data is and we can't predict outside of the sample (yet!).
+
+
+---
+## Methodolgoy
+
+- Utilizing widgets in shiny, the app allows the user to actively select the predictor from the mtcars dataset.
+- Next the app fits a linear regression with the lm() function.
+- Finally, the app allows the user to select an input value and predict the mpg.
+
+```{r,echo=FALSE,fig.width=7, fig.height=4,fig.align='center'}
+data(mtcars)
+mtcars$type<-"Original"
+mtcars<-subset(mtcars,select=c(hp,mpg,type))
+newx<-150.0
+fit<-lm(mpg~hp,data=mtcars)
+newy<-predict(fit,newdata=data.frame(hp=newx))
+newdata<-rbind(mtcars,data.frame(hp=newx,mpg=newy,type="New"))
+p<-qplot(hp,mpg,data=newdata,main='Prediction of mpg using mtcars',xlab='hp',ylab='mpg',color=type)
+p+geom_abline(intercept=fit$coefficients[1],slope=fit$coefficients[2],color='#0000ff22',size=1.1)
+print("At 150 hp, your car will use 19.864 mpg")
+```
+
+
+
+
+--- .class #id 
+
+## Link to Project
+
+
+<iframe src = 'https://cjstev.shinyapps.io/ShinyProject/' height = '600px'></iframe>
+
